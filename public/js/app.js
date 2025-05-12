@@ -17,6 +17,9 @@ const conversionRate = document.getElementById('conversion-rate');
 const lastUpdatedElement = document.getElementById('last-updated');
 const loadingContainer = document.getElementById('loading-container');
 const errorContainer = document.getElementById('error-container');
+const historyContainer = document.getElementById('history-container');
+const historyTableBody = document.getElementById('history-table-body');
+const noHistoryElement = document.getElementById('no-history');
 
 // Constants
 const API_URL = 'https://api.exchangerate.host';
@@ -48,6 +51,7 @@ const COMMON_CURRENCY_NAMES = {
 document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
     setupEventListeners();
+    loadConversionHistory();
 });
 
 /**
@@ -87,10 +91,29 @@ function setupEventListeners() {
     // Swap button event
     swapButton.addEventListener('click', swapCurrencies);
     
+    // Quick convert button event
+    const quickConvertBtn = document.getElementById('quick-convert-btn');
+    if (quickConvertBtn) {
+        quickConvertBtn.addEventListener('click', performSampleConversion);
+    }
+    
     // Input validations
     amountInput.addEventListener('input', () => {
         if (amountInput.value < 0) amountInput.value = 0;
     });
+}
+
+/**
+ * Perform a sample conversion with preset values
+ */
+function performSampleConversion() {
+    // Set preset values
+    amountInput.value = 100;
+    fromCurrencySelect.value = 'USD';
+    toCurrencySelect.value = 'EUR';
+    
+    // Trigger form submission
+    converterForm.dispatchEvent(new Event('submit'));
 }
 
 /**
@@ -345,6 +368,9 @@ function displayResult(amount, fromCurrency, convertedAmount, toCurrency, rate) 
     // Show the result container with animation
     resultContainer.classList.remove('d-none');
     resultContainer.classList.add('fade-in');
+    
+    // Save the conversion to history
+    saveConversionToHistory(amount, fromCurrency, convertedAmount, toCurrency, rate);
 }
 
 /**
@@ -410,4 +436,101 @@ function showError(message) {
 function hideError() {
     errorContainer.textContent = '';
     errorContainer.classList.add('d-none');
+}
+
+/**
+ * Save conversion to database
+ * @param {number} amount - The original amount
+ * @param {string} fromCurrency - The source currency
+ * @param {number} convertedAmount - The converted amount
+ * @param {string} toCurrency - The target currency
+ * @param {number} rate - The exchange rate used
+ */
+async function saveConversionToHistory(amount, fromCurrency, convertedAmount, toCurrency, rate) {
+    try {
+        const response = await fetch('/api/conversions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                amount,
+                fromCurrency,
+                toCurrency,
+                rate,
+                convertedAmount
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+        
+        // Reload conversion history
+        loadConversionHistory();
+    } catch (error) {
+        console.error('Error saving conversion history:', error);
+    }
+}
+
+/**
+ * Load conversion history from database
+ */
+async function loadConversionHistory() {
+    try {
+        const response = await fetch('/api/conversions');
+        
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+        
+        const history = await response.json();
+        
+        if (history.length === 0) {
+            // No history available
+            historyContainer.classList.add('d-none');
+            noHistoryElement.classList.remove('d-none');
+            return;
+        }
+        
+        // Display history
+        displayConversionHistory(history);
+    } catch (error) {
+        console.error('Error loading conversion history:', error);
+        historyContainer.classList.add('d-none');
+        noHistoryElement.classList.remove('d-none');
+        noHistoryElement.textContent = `Error loading history: ${error.message}`;
+    }
+}
+
+/**
+ * Display conversion history
+ * @param {Array} history - Array of conversion history records
+ */
+function displayConversionHistory(history) {
+    // Clear existing history
+    historyTableBody.innerHTML = '';
+    
+    // Add each history record to the table
+    history.forEach(record => {
+        const row = document.createElement('tr');
+        
+        // Format date
+        const date = new Date(record.created_at);
+        const formattedDate = formatDate(date);
+        
+        row.innerHTML = `
+            <td>${record.from_currency}</td>
+            <td>${record.to_currency}</td>
+            <td>${formatCurrency(record.amount, record.from_currency)}</td>
+            <td>${formatCurrency(record.converted_amount, record.to_currency)}</td>
+            <td>${formattedDate}</td>
+        `;
+        
+        historyTableBody.appendChild(row);
+    });
+    
+    // Show history container, hide no history message
+    historyContainer.classList.remove('d-none');
+    noHistoryElement.classList.add('d-none');
 }

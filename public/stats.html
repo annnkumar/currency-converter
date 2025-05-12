@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Statistics</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="mb-0">
+                                <i class="fas fa-chart-line text-primary me-2"></i>
+                                Currency Statistics
+                            </h1>
+                            <a href="/" class="btn btn-outline-primary">
+                                <i class="fas fa-exchange-alt me-2"></i>Back to Converter
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="error-container" class="alert alert-danger d-none" role="alert">
+                            <!-- Error messages will appear here -->
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h4 class="mb-0">Popular Currency Pairs</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="popular-pairs-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h4 class="mb-0">Conversion Volume</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="conversion-volume-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h4 class="mb-0">Currency Distribution</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="currency-distribution-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4 class="mb-3">
+                                <i class="fas fa-history text-secondary me-2"></i>
+                                Recent Conversions
+                            </h4>
+                            <div id="history-container">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>From</th>
+                                                <th>To</th>
+                                                <th>Amount</th>
+                                                <th>Result</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="history-table-body">
+                                            <!-- History will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="no-history" class="alert alert-info d-none">
+                                No conversion history available yet. Make your first conversion!
+                            </div>
+                        </div>
+
+                        <div id="loading-container" class="text-center my-4 d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading statistics...</p>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center bg-transparent">
+                        <p class="mb-0 small text-muted">
+                            Currency Converter Statistics Dashboard
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom JS -->
+    <script src="js/stats.js"></script>
+</body>
+</html>
