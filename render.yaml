@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: currency-converter-pro
+    env: python
+    buildCommand: npm install && pip install -r requirements.txt
+    startCommand: gunicorn main:app --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.0
+      - key: NODE_VERSION
+        value: 18.0.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: currency-converter-db
+          property: connectionString
+
+databases:
+  - name: currency-converter-db
+    databaseName: currency_converter
+    user: currency_converter
+    plan: free
