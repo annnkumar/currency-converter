@@ -22,7 +22,8 @@ const historyTableBody = document.getElementById('history-table-body');
 const noHistoryElement = document.getElementById('no-history');
 
 // Constants
-const API_URL = 'https://api.exchangerate.host';
+const API_KEY = 'dbc72d7be5eee6a8d33455db';
+const API_URL = 'https://v6.exchangerate-api.com/v6/' + API_KEY;
 const POPULAR_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'RUB'];
 const COMMON_CURRENCY_NAMES = {
     'USD': 'US Dollar',
@@ -188,7 +189,7 @@ function swapCurrencies() {
  */
 async function fetchSupportedCurrencies() {
     try {
-        const response = await fetch(`${API_URL}/symbols`);
+        const response = await fetch(`${API_URL}/codes`);
         
         if (!response.ok) {
             throw new Error(`API error: ${response.status}`);
@@ -196,12 +197,12 @@ async function fetchSupportedCurrencies() {
         
         const data = await response.json();
         
-        if (!data.success) {
+        if (data.result !== "success") {
             throw new Error('Failed to fetch currencies');
         }
         
         // Process currency data
-        processCurrencyData(data.symbols);
+        processCurrencyData(data.supported_codes);
         
         // Populate the currency dropdowns
         populateCurrencyDropdowns();
@@ -215,13 +216,13 @@ async function fetchSupportedCurrencies() {
 
 /**
  * Process currency data into a usable format
- * @param {Object} symbols - Object with currency symbols
+ * @param {Array} supportedCodes - Array of currency codes and names
  */
-function processCurrencyData(symbols) {
+function processCurrencyData(supportedCodes) {
     currencyData = {};
     
-    Object.entries(symbols).forEach(([code, data]) => {
-        currencyData[code] = data.description;
+    supportedCodes.forEach(([code, name]) => {
+        currencyData[code] = name;
     });
 }
 
@@ -282,7 +283,7 @@ function createCurrencyOption(code, name) {
  */
 async function fetchExchangeRates(baseCurrency) {
     try {
-        const response = await fetch(`${API_URL}/latest?base=${baseCurrency}`);
+        const response = await fetch(`${API_URL}/latest/${baseCurrency}`);
         
         if (!response.ok) {
             throw new Error(`API error: ${response.status}`);
@@ -290,15 +291,15 @@ async function fetchExchangeRates(baseCurrency) {
         
         const data = await response.json();
         
-        if (!data.success) {
+        if (data.result !== "success") {
             throw new Error('Failed to fetch exchange rates');
         }
         
         // Store the exchange rates
-        exchangeRates[baseCurrency] = data.rates;
+        exchangeRates[baseCurrency] = data.conversion_rates;
         
         // Store the last updated time
-        lastUpdated = new Date(data.date);
+        lastUpdated = new Date(data.time_last_update_unix * 1000); // Convert Unix timestamp to JS Date
     } catch (error) {
         throw new Error(`Failed to fetch exchange rates: ${error.message}`);
     }
