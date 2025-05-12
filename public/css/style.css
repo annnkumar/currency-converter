@@ -1,0 +1,58 @@
+/* Custom styles for the Currency Converter app */
+
+body {
+    min-height: 100vh;
+    background-color: var(--bs-dark-bg-subtle);
+}
+
+.card {
+    border-radius: 1rem;
+    border: none;
+}
+
+.card-header {
+    border-radius: 1rem 1rem 0 0 !important;
+}
+
+.card-footer {
+    border-radius: 0 0 1rem 1rem !important;
+}
+
+#result-container {
+    background-color: var(--bs-dark-bg-subtle);
+    transition: all 0.3s ease;
+}
+
+#conversion-result {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Make sure invalid inputs have appropriate styling */
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    border-color: var(--bs-danger);
+    background-image: none;
+}
+
+/* Smooth transitions for showing/hiding elements */
+.fade-in {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive font sizes */
+@media (max-width: 768px) {
+    #conversion-result {
+        font-size: 1.5rem;
+    }
+}
